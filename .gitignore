@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite
+*.log
+
+# Virtual Environment (assuming it's inside the root folder or 'venv' folder)
+venv/
+.env/
+
+# Dependency directories
+/requirements.txt
+/poetry.lock
+/pyproject.toml
+
+# MySQL / PostgreSQL
+*.sql
+*.sqlite
+db.sqlite3
+*.pgdata/
+
+# Docker
+**/docker-compose.override.yml
+**/docker-compose.local.yml
+**/Dockerfile
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# MacOS
+.DS_Store
+
+# Linux
+*.swp
+
+# Operating system specific files
+Thumbs.db
+ehthumbs.db
