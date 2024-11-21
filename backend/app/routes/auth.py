@@ -29,6 +29,11 @@ def register_user(user:UserCreate, db:Session= Depends(get_db)):
 
 @router.post('/login',tags=['authentication'])
 def login_user(form_data:OAuth2PasswordRequestForm = Depends(),db:Session=Depends(get_db)):
+    if not form_data.username or not form_data.password:
+        raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail="Username and password cannot be empty"
+    )
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password,user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid credentials")
