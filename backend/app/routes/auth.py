@@ -18,8 +18,8 @@ def register_user(user:UserCreate, db:Session= Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Email already exists")
-    hashed_password = hash_password(user.password)
-    db_user = User(email=user.email,hashed_password=hashed_password,first_name=user.first_name,last_name=user.last_name)
+    password = hash_password(user.password)
+    db_user = User(email=user.email,password=password,first_name=user.first_name,last_name=user.last_name)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -35,7 +35,7 @@ def login_user(form_data:OAuth2PasswordRequestForm = Depends(),db:Session=Depend
         detail="Username and password cannot be empty"
     )
     user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not verify_password(form_data.password,user.hashed_password):
+    if not user or not verify_password(form_data.password,user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid credentials")
     access_token = create_access_token(data={"sub":user.email})
     refresh_token = create_refresh_token(data={"sub": user.email})
@@ -47,7 +47,6 @@ def login_user(form_data:OAuth2PasswordRequestForm = Depends(),db:Session=Depend
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "is_subscribed": user.is_subscribed
         }
     }
 

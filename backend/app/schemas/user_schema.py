@@ -34,8 +34,6 @@ class UserUpdate(BaseModel):
 
 class UserOut(UserBase):
   id: UUID
-  is_subscribed: bool
-  subscription_end: datetime | None
 
   class Config:
     from_attributes = True

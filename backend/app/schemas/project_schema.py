@@ -11,12 +11,17 @@ class ProjectCreate(ProjectBase):
   pass
 
 class ProjectUpdate(ProjectBase):
-  pass
+  title: str | None = None
+  description: str | None = None
 
 class ProjectOut(ProjectBase):
   id:UUID
-  owner_id:UUID
-  team_members:List[UserOut]
 
   class Config:
     from_attributes = True
+
+class ProjectDetailOut(ProjectOut):
+    team_members: List[UserOut] = [] 
+    
+    class Config:
+        from_attributes = True
