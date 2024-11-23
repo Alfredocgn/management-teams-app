@@ -115,17 +115,20 @@ async def update_task(
                 detail="Invalid status"
             )
 
+    
     if 'assignee_id' in update_data:
-        assignee_membership = db.query(ProjectUser).filter(
-            ProjectUser.project_id == project_id,
-            ProjectUser.user_id == update_data['assignee_id']
-        ).first()
-        
-        if not assignee_membership:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Assignee must be a project member"
-            )
+
+        if update_data['assignee_id'] is not None:
+            assignee_membership = db.query(ProjectUser).filter(
+                ProjectUser.project_id == project_id,
+                ProjectUser.user_id == update_data['assignee_id']
+            ).first()
+            
+            if not assignee_membership:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Assignee must be a project member"
+                )
 
     for field, value in update_data.items():
         setattr(task, field, value)

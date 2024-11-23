@@ -10,11 +10,13 @@ __pycache__/
 # Virtual Environment (assuming it's inside the root folder or 'venv' folder)
 venv/
 .env/
+.env
+*.env
+.env.*
 
 # Dependency directories
 /requirements.txt
-/poetry.lock
-/pyproject.toml
+
 
 # MySQL / PostgreSQL
 *.sql
@@ -42,3 +44,14 @@ db.sqlite3
 # Operating system specific files
 Thumbs.db
 ehthumbs.db
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.env
+
+# Build
+dist/
+build/
+*.local

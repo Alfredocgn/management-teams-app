@@ -1,10 +1,11 @@
 from fastapi import APIRouter,Depends,HTTPException,status
 from sqlalchemy.orm import Session
-from db.models import User
+from db.models import User,StripeSubscription,SubscriptionStatus
 from config.security import get_current_user
 from db.database import get_db
 from config.security import hash_password
 from schemas.user_schema import UserOut,UserUpdate
+
 
 
 
@@ -57,3 +58,18 @@ async def delete_user(
       status_code= status.HTTP_500_INTERNAL_SERVER_ERROR,
       detail = "Error deleting user"
     )
+
+@router.get('/users/search', response_model=UserOut, tags=['users'])
+async def search_user(
+    email: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return user
+
