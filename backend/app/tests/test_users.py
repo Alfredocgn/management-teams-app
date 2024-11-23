@@ -36,8 +36,7 @@ def test_update_profile_duplicate_email(client,auth_headers,db):
     email="other@example.com",
     first_name="firstName",
     last_name='lastName',
-    hashed_password=hash_password('Password123'),
-    is_subscribed = True
+    password=hash_password('Password123'),
   )
   db.add(other_user)
   db.commit()

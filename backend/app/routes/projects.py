@@ -15,28 +15,33 @@ router = APIRouter()
 
 @router.post('/projects',response_model = ProjectOut,tags=['projects'])
 async def create_project(project:ProjectCreate, current_user:User=Depends(get_current_user),db:Session=Depends(get_db)):
-  if not current_user.stripe_subscription:
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="User is not subscribed")
-  
-  new_project = Project(**project.model_dump())
-  db.add(new_project)
-  db.commit()
-  db.refresh(new_project)
-  new_project_user = ProjectUser(project_id=new_project.id,user_id=current_user.id,role= UserRole.admin.value)
-  db.add(new_project_user)
-  db.commit()
-  db.refresh(new_project_user)
-  return new_project
+    if not current_user.stripe_subscription:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="User is not subscribed")
+    new_project = Project(**project.model_dump())
+    db.add(new_project)
+    db.commit()
+    db.refresh(new_project)
+    new_project_user = ProjectUser(project_id=new_project.id,user_id=current_user.id,role= UserRole.admin.value)
+    db.add(new_project_user)
+    db.commit()
+    db.refresh(new_project_user)
+    return new_project
 
 
 @router.get('/projects',response_model = List[ProjectOut], tags=['projects'])
 async def get_projects(current_user: User= Depends(get_current_user),db:Session=Depends(get_db)):
-  project_users = db.query(ProjectUser).filter((ProjectUser.user_id == current_user.id)).all()
-  projects = [pu.project for pu in project_users]
-  return projects
+    project_users = db.query(ProjectUser).filter((ProjectUser.user_id == current_user.id)).all()
+    projects = [pu.project for pu in project_users]
+    return projects
 
 @router.get('/projects/{project_id}', response_model=ProjectOut, tags=['projects'])
 async def get_project(project_id: UUID, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
     project_user = db.query(ProjectUser).filter(
         ProjectUser.project_id == project_id,
         ProjectUser.user_id == current_user.id

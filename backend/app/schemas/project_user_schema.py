@@ -17,3 +17,4 @@ class ProjectUserOut(ProjectUserBase):
   id:UUID
   class Config:
     from_attributes = True
+

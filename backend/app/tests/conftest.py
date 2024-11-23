@@ -4,12 +4,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.database import Base, get_db
 from main import app
-from db.models import User
+from db.models import User,StripeSubscription
 from config.security import hash_password
 from uuid import uuid4
 from dotenv import load_dotenv
 import os
-
+from datetime import datetime,timedelta
 load_dotenv()
 
 TEST_DB = os.getenv('SQLALCHEMY_TEST_DATABASE_URL')
@@ -45,12 +45,20 @@ def test_user(db):
     email="test@example.com",
     first_name="Test",
     last_name = "User",
-    hashed_password=hash_password("Password123"),
-    is_subscribed=True,
+    password=hash_password("Password123"),
   )
   db.add(user)
   db.commit()
   db.refresh(user)
+  subscription = StripeSubscription(
+      id=uuid4(),
+      user_id=user.id,
+      subscription_id="sub_123",
+      status="active",
+      current_period_start=datetime.utcnow()
+  )
+  db.add(subscription)
+  db.commit()
   return user
 
 @pytest.fixture(scope="function")

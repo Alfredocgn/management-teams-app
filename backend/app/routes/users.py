@@ -38,8 +38,6 @@ async def update_user(
 
 @router.get("/users",response_model=list[UserOut],tags=['users'])
 async def get_users(skip:int=0,limit:int=10,db:Session=Depends(get_db)):
-  # if not current_user.is_subscribed:
-  #   raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="User is not subscribed")
   
   return db.query(User).offset(skip).limit(limit).all()
 
