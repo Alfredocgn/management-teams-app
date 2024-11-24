@@ -10,6 +10,9 @@ from db.models import Project,ProjectUser,UserRole
 from typing import List
 from uuid import UUID
 
+#Comentarios
+# No estaba definido en los requerimientos pero se considera que se debe manejar
+# los delete como un soft delete, es decir, no se elimina el registro de la base de datos sino que se marca como eliminado cambiando el campo is_active a False
 
 router = APIRouter()
 
@@ -102,11 +105,21 @@ async def delete_project(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='Only project admin can delete the project'
         )
+    try:
+        db.query(ProjectUser).filter(
+            ProjectUser.project_id == project_id
+        ).delete()
 
-    project = project_user.project
-    db.delete(project) 
-    db.commit()
-    return {"message": "Project deleted successfully"}
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if project:
+            db.delete(project) 
+            db.commit()
+            return {"message": "Project deleted successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Project not found")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(e))
+    
 
 
 @router.post('/projects/{project_id}/members/{user_id}', response_model=ProjectOut, tags=["projects"])

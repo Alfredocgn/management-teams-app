@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: teams_dev
     ports:
-      - "5432:5432"  # Exponer el puerto localmente
+      - "5432:5432" 
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

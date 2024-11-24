@@ -7,7 +7,9 @@ from config.security import hash_password
 from schemas.user_schema import UserOut,UserUpdate
 
 
-
+#Comentarios
+# No estaba definido en los requerimientos pero se considera que se debe manejar
+# los delete como un soft delete, es decir, no se elimina el registro de la base de datos sino que se marca como eliminado cambiando el campo is_active a False
 
 router = APIRouter()
 

@@ -7,6 +7,10 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -18,6 +22,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <div className='flex gap-2'>
               <button onClick={() => navigate('/dashboard/projects')}>Projects</button>
               <button onClick={() => navigate('/dashboard/subscription')}>Subscription</button>
+              <button onClick={handleLogout}>Logout</button>
               </div>
             </div>
           </div>

@@ -8,7 +8,9 @@ from typing import List
 from uuid import UUID
 from routes.projects import get_project
 
-
+#Comentarios
+# No estaba definido en los requerimientos pero se considera que se debe manejar
+# los delete como un soft delete, es decir, no se elimina el registro de la base de datos sino que se marca como eliminado cambiando el campo is_active a False
 
 router = APIRouter()
 
