@@ -73,3 +73,16 @@ async def search_user(
         )
     return user
 
+@router.get('/subscription-status', tags=['users'])
+async def get_subscription_status(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    subscription = db.query(StripeSubscription).filter(
+        StripeSubscription.user_id == current_user.id
+    ).first()
+    
+    return {
+        "status": subscription.status if subscription else SubscriptionStatus.inactive.value
+    }
+  

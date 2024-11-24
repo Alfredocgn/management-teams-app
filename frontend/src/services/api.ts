@@ -122,8 +122,19 @@ export const taskApi = {
     } catch (error) {
       throw error;
     }
+  },
+
+  deleteTask: async (projectId: string, taskId: string) => {
+    try {
+      const response = await api.delete(`/api/projects/${projectId}/tasks/${taskId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };
+
+
 
 export const projectMemberApi = {
   getProjectMembers: async (projectId: string) => {
@@ -162,5 +173,27 @@ export const userApi = {
     } catch (error) {
       throw error;
     }
+  },
+  getSubscriptionStatus: async () => {
+    try{
+
+      const response = await api.get('/api/subscription-status');
+      return response.data;
+    }catch(error){
+      throw error
+    }
+  }
+};
+
+
+export const subscriptionApi = {
+  getProducts: async () => {
+    const response = await api.get('/api/products');
+    return response.data;
+  },
+
+  createCheckoutSession: async (price_id: string) => {
+    const response = await api.post('/api/create-checkout-session', { price_id });
+    return response.data;
   }
 };

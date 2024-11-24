@@ -11,16 +11,23 @@ export const CreateTaskForm = ({ projectId, onSubmit, members }: CreateTaskFormP
       description: '',
       due_date: '',
       assignee_id: '',
+      status: 'pending'
     },
     validationSchema: Yup.object({
       title: Yup.string().required('Required'),
       description: Yup.string().required('Required'),
       due_date: Yup.date().nullable(),
-      assignee_id: Yup.string(),
+      assignee_id: Yup.string().nullable(),
+      status: Yup.string().oneOf(['pending', 'in_progress', 'completed']).default('pending'),
     }),
     onSubmit: async (values) => {
       try {
-        await taskApi.createTask(projectId, values);
+        const taskData = {
+          ...values,
+          assignee_id: values.assignee_id || null,
+          due_date: values.due_date ? new Date(values.due_date).toISOString() : null,
+        };
+        await taskApi.createTask(projectId, taskData);
         onSubmit();
       } catch (error) {
         console.error('Failed to create task:', error);

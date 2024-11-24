@@ -28,7 +28,7 @@ export const LoginForm = () => {
         const response = await authApi.login(values.email, values.password);
         localStorage.setItem('token', response.access_token);
         localStorage.setItem('refresh_token', response.refresh_token);
-        navigate('/dashboard');
+        navigate('/dashboard/projects');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         const errorMessage = err.response?.data?.detail || 'Login failed';

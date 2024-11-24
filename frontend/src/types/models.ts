@@ -40,15 +40,15 @@ export interface Task {
   status: 'pending' | 'in_progress' | 'completed';
   project_id: string;
   assignee_id?: string | null;
-  due_date?: string;
+  due_date?: string | null;
   assignee?: User;
 }
 
 export interface CreateTaskData {
   title: string;
   description: string;
-  due_date?: string;
-  assignee_id?: string;
+  due_date?: string | null;
+  assignee_id?: string | null;
 }
 
 export interface ProjectUser {

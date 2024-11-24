@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { User } from '../../types/models';
 import { projectMemberApi, userApi } from '../../services/api';
+import { useSubscriptionStatus } from '../../hooks/useSubscriptionStatus';
 
 interface MemberListProps {
   projectId: string;
@@ -12,6 +13,7 @@ export const MemberList = ({ projectId, members, onMembersChange }: MemberListPr
   const [showAddForm, setShowAddForm] = useState(false);
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const { isSubscribed } = useSubscriptionStatus();
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,12 +45,14 @@ export const MemberList = ({ projectId, members, onMembersChange }: MemberListPr
       <div className="px-4 py-5 sm:p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-medium text-gray-900">Team Members</h2>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-          >
-            {showAddForm ? 'Cancel' : 'Add Member'}
-          </button>
+          {isSubscribed && (
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            >
+              {showAddForm ? 'Cancel' : 'Add Member'}
+            </button>
+          )}
         </div>
 
         {error && (
@@ -86,12 +90,14 @@ export const MemberList = ({ projectId, members, onMembersChange }: MemberListPr
                 </p>
                 <p className="text-sm text-gray-500">{member.email}</p>
               </div>
-              <button
-              onClick={() => handleRemoveMember(member.id)}
-              className="text-red-600 hover:text-red-800"
-            >
-                Remove
-              </button>
+              {isSubscribed && (
+                <button
+                  onClick={() => handleRemoveMember(member.id)}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  Remove
+                </button>
+              )}
             </div>
           ))}
           {members.length === 0 && (

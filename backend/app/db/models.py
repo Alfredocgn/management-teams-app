@@ -65,4 +65,4 @@ class StripeSubscription(Base):
   user = relationship("User",back_populates="stripe_subscription")
   subscription_id = Column(String)
   status = Column(String,default=SubscriptionStatus.inactive.value)
-  current_period_start = Column(DateTime)
+  current_period_start = Column(DateTime,nullable=True)

@@ -8,6 +8,7 @@ import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute'
 import { DashboardLayout } from './components/DashboardLayout/DashboardLayout'
 import { Projects } from './components/Project/Project'
 import { ProjectDetails } from './components/Project/ProjectDetails'
+import { SubscriptionPlans } from './components/Subscriptions/SubscriptionPlans'
 
 function App() {
 
@@ -26,10 +27,10 @@ function App() {
           <LoginForm />
         </AuthLayout>
       } />
-      <Route path="/dashboard" element={
+      <Route path="/dashboard/subscription" element={
           <ProtectedRoute>
             <DashboardLayout>
-              <div>Dashboard Content</div>
+              <SubscriptionPlans />
             </DashboardLayout>
           </ProtectedRoute>
         } />
