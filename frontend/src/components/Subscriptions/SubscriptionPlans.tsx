@@ -34,15 +34,19 @@ export const SubscriptionPlans = () => {
   const handleSubscribe = async (priceId: string) => {
     try {
       setLoading(true);
-      const { url } = await subscriptionApi.createCheckoutSession(priceId);
-      window.location.href = url;
+      const session = await subscriptionApi.createCheckoutSession(priceId);
+      if (session.url) {
+        window.location.href = session.url;
+      } else {
+        setError('Invalid checkout session response');
+      }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to initiate subscription');
     } finally {
       setLoading(false);
     }
-  };
+};
 
   if (loading) {
     return (

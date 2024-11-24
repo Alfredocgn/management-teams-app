@@ -75,11 +75,11 @@ async def create_checkout_session(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-
-
     try:
+      
+        user = register_user_on_stripe(current_user, db)
         checkout_session = stripe.checkout.Session.create(
-            customer_email=current_user.email,
+            customer_email=user.email,
             payment_method_types=["card"],
             line_items=[{"price": request.price_id, "quantity": 1}],
             mode="subscription",
@@ -89,6 +89,7 @@ async def create_checkout_session(
                 "user_id": str(current_user.id)
             }
         )
+        print(checkout_session,'this is checkout')
         return checkout_session
     except InvalidRequestError as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -96,10 +97,16 @@ async def create_checkout_session(
 @router.post("/webhook", tags=["stripe"])
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
-    print(payload,request)
     sig_header = request.headers.get("stripe-signature")
+    print("Webhook received!")
+    print("Headers:", dict(request.headers))
+    print("Payload:", payload.decode())
+    print("Signature:", sig_header)
     
     if not sig_header:
+        # For test events from Hookdeck
+        if '"test":true' in payload.decode():
+            return {"status": "success", "message": "Test event received"}
         raise HTTPException(status_code=400, detail="No Stripe signature found")
 
     try:
@@ -109,45 +116,46 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             secret=os.getenv("STRIPE_WEBHOOK_SECRET")
         )
         
+        print(f"Event type received: {event.type}")
+        
         match event.type:
             case "checkout.session.completed":
-
                 subscription_id = event.data.object.get("subscription")
                 user_id = event.data.object.get("metadata", {}).get("user_id")
                 
                 if user_id:
-                    subscription = StripeSubscription(
-                        user_id=user_id,
-                        subscription_id=subscription_id,
-                        status=SubscriptionStatus.active.value,
-                        current_period_start=datetime.datetime.now()
-                    )
-                    db.add(subscription)
-                    db.commit()
+                    existing_subscription = db.query(StripeSubscription).filter(
+                        StripeSubscription.user_id == user_id
+                    ).first()
                     
-            case "invoice.payment_succeeded":
-                subscription_id = event.data.object.get("subscription")
-                subscription = db.query(StripeSubscription).filter(
-                    StripeSubscription.subscription_id == subscription_id
-                ).first()
+                    if existing_subscription:
+                        existing_subscription.subscription_id = subscription_id
+                        existing_subscription.status = SubscriptionStatus.active.value
+                        existing_subscription.current_period_start = datetime.datetime.now()
+                        db.commit()
+                    else:
+                        subscription = StripeSubscription(
+                            user_id=user_id,
+                            subscription_id=subscription_id,
+                            status=SubscriptionStatus.active.value,
+                            current_period_start=datetime.datetime.now()
+                        )
+                        db.add(subscription)
+                        db.commit()
+                    print(f"Subscription updated for user {user_id}")
+            
+            case "charge.updated":
+                # Just log the event and return success
+                print(f"Charge updated event received: {event.data.object.id}")
+            
+            case _:
+                # Handle any other event type gracefully
+                print(f"Unhandled event type: {event.type}")
                 
-                if subscription:
-                    subscription.status = SubscriptionStatus.active.value
-                    subscription.current_period_start = datetime.datetime.fromtimestamp(
-                        event.data.object.get("period_start")
-                    )
-                    db.commit()
-                    
-            case "customer.subscription.deleted":
-                subscription_id = event.data.object.get("id")
-                subscription = db.query(StripeSubscription).filter(
-                    StripeSubscription.subscription_id == subscription_id
-                ).first()
-                
-                if subscription:
-                    subscription.status = SubscriptionStatus.inactive.value
-                    db.commit()
-
-        return {"status": "success"}
+        return {"status": "success", "type": event.type}
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error processing webhook: {str(e)}")
+        # Return 200 for events we don't need to handle
+        # This prevents Stripe from retrying webhooks unnecessarily
+        return {"status": "success", "message": "Event acknowledged"}

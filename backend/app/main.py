@@ -9,10 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://hkdk.events",
+        "https://events.hookdeck.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*", "stripe-signature"],  
 )
 app.include_router(auth.router)
 app.include_router(users.router,prefix="/api")
