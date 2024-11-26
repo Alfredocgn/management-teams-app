@@ -2,15 +2,17 @@ from fastapi import APIRouter,HTTPException,status,Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from config.security import get_current_user
-from db.models import User,Project,Task,TaskStatus,ProjectUser,UserRole
+from db.models import User,Task,TaskStatus,ProjectUser,UserRole
 from schemas.task_schema import TaskCreate,TaskOut,TaskUpdate
 from typing import List
 from uuid import UUID
-from routes.projects import get_project
+
 
 #Comentarios
 # No estaba definido en los requerimientos pero se considera que se debe manejar
 # los delete como un soft delete, es decir, no se elimina el registro de la base de datos sino que se marca como eliminado cambiando el campo is_active a False
+# Para manejar un alto volumen de task y de performance con la base de datos se consideraria agregar un paginacion e ir trayendo tareas de 25 en 25 segun se especifique
+# Tambien se penso que se podria agregar un historial de tareas.
 
 router = APIRouter()
 

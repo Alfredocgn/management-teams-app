@@ -13,6 +13,8 @@ from schemas.user_schema import UserOut,UserUpdate
 
 router = APIRouter()
 
+# Se implementaron rutas de perfil para editar perfil borrar perfil y actualizar perfil que no se encuentran en el frontend por falta de tiempo pero se les considero la funcionalidad
+
 
 @router.get('/profile',response_model=UserOut,tags=['users'])
 async def get_profile(user:User= Depends(get_current_user)):

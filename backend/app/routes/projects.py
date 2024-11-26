@@ -14,6 +14,9 @@ from uuid import UUID
 # No estaba definido en los requerimientos pero se considera que se debe manejar
 # los delete como un soft delete, es decir, no se elimina el registro de la base de datos sino que se marca como eliminado cambiando el campo is_active a False
 
+# Para proyectos se considera que se podria agregar una paginacion para manejar gran cantidad y optimizar la busqueda y performance de base de datos.
+# Se piensas que mas adelante se podrian agregar categorias de proyectos y establecer filtros de busqueda, por categorias, usuarios, o completados.
+
 router = APIRouter()
 
 @router.post('/projects',response_model = ProjectOut,tags=['projects'])

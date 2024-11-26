@@ -9,11 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://hkdk.events",
-        "https://events.hookdeck.com"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*", "stripe-signature"],  
@@ -31,3 +27,10 @@ def get_db_session(db:Session = Depends(get_db)):
 async def startup():
   models.Base.metadata.create_all(bind=engine)
 
+@app.get("/test-db")
+def test_db(session: Session = Depends(get_db)):
+    try:
+        session.execute("SELECT 1")
+        return {"status": "Database connected successfully"}
+    except Exception as e:
+        return {"status": "Error", "details": str(e)}

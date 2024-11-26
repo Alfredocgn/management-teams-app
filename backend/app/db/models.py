@@ -53,8 +53,8 @@ class Task(Base):
   status=Column(String,default=TaskStatus.pending.value)
   due_date = Column(DateTime)
   project_id = Column(UUID(as_uuid=True),ForeignKey("projects.id"))
-  project = relationship("Project",back_populates="tasks") # a lo mejor esta relacion no es necesaria
-  assignee_id = Column(UUID(as_uuid=True),ForeignKey("users.id")) # pueden ser varios usuarios (?) - seria many to many
+  project = relationship("Project",back_populates="tasks") 
+  assignee_id = Column(UUID(as_uuid=True),ForeignKey("users.id")) 
   assignee = relationship("User")
 
 
