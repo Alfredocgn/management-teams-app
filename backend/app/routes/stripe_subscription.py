@@ -98,10 +98,6 @@ async def create_checkout_session(
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
-    print("Webhook received!")
-    print("Headers:", dict(request.headers))
-    print("Payload:", payload.decode())
-    print("Signature:", sig_header)
     
     if not sig_header:
         # For test events from Hookdeck
@@ -147,6 +143,37 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             case "charge.updated":
                 # Just log the event and return success
                 print(f"Charge updated event received: {event.data.object.id}")
+            case "invoice.payment_succeeded":
+                subscription_id = event.data.object.get("subscription")
+                customer_email = event.data.object.get("customer_email")
+               
+                if customer_email:
+
+                    user = db.query(User).filter(
+                        User.email == customer_email
+                    ).first()
+                   
+                    if user:
+                        existing_subscription = db.query(StripeSubscription).filter(
+                            StripeSubscription.user_id == user.id
+                        ).first()
+                       
+                        if existing_subscription:
+                            existing_subscription.status = SubscriptionStatus.active.value
+                            existing_subscription.current_period_start = datetime.datetime.now()
+                            existing_subscription.subscription_id = subscription_id
+                        else:
+                            subscription = StripeSubscription(
+                                user_id=user.id,
+                                subscription_id=subscription_id,
+                                status=SubscriptionStatus.active.value,
+                                current_period_start=datetime.datetime.now()
+                            )
+                            db.add(subscription)
+                        db.commit()
+                        print(f"Subscription payment processed for user {user.id}")
+                else:
+                    print("No customer email found in the event")
             
             case _:
                 # Handle any other event type gracefully
