@@ -1,100 +1,101 @@
 /* eslint-disable no-useless-catch */
-import axios from 'axios'
-import { CreateProjectData, CreateTaskData, LoginResponse, Project, RegisterData, Task } from '../types/models'
+import axios from "axios";
+import {
+  CreateProjectData,
+  CreateTaskData,
+  LoginResponse,
+  Project,
+  RegisterData,
+  Task,
+} from "../types/models";
 
 const api = axios.create({
-  baseURL: `http://localhost:8000`,
-  headers:{
-    'Content-Type':'application/json'
-  }
-})
+  baseURL: `http://44.204.12.162`,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export const authApi = {
-  register: async (data:RegisterData) => {
-    try{
-      const response = await api.post('/register',data)
-      return response.data
-
-    }catch(error){
-      throw error
+  register: async (data: RegisterData) => {
+    try {
+      const response = await api.post("/register", data);
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   },
 
-  login: async(email:string,password:string):Promise<LoginResponse> => {
+  login: async (email: string, password: string): Promise<LoginResponse> => {
     const data = {
       username: email,
       password: password,
-      grant_type: 'password'
+      grant_type: "password",
     };
 
-    const response = await api.post('/login',data, {
+    const response = await api.post("/login", data, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    })
-    return response.data
-}
-}
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    return response.data;
+  },
+};
 
 export const projectApi = {
   getProjects: async () => {
-    try{
-      const response = await api.get('/api/projects')
-      return response.data
-    }catch(error){
-      throw error
+    try {
+      const response = await api.get("/api/projects");
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   },
 
-  createProject: async (data:CreateProjectData) => {
-    try{
-      const response = await api.post('/api/projects',data)
-      return response.data
-    }catch(error){
-      throw error
+  createProject: async (data: CreateProjectData) => {
+    try {
+      const response = await api.post("/api/projects", data);
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   },
 
-  getProject:async(id:string) => {
-    try{
-      const response = await api.get(`/api/projects/${id}`)
-      return response.data
-    }catch(error){
-      throw error
+  getProject: async (id: string) => {
+    try {
+      const response = await api.get(`/api/projects/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
     }
-
   },
 
-  updateProject: async(id:string,data:Partial<Project>) => {
-    try{
-
-      const response = await api.put(`/api/projects/${id}`,data)
-      return response.data
-    }catch(error){
-      throw error
-  }
+  updateProject: async (id: string, data: Partial<Project>) => {
+    try {
+      const response = await api.put(`/api/projects/${id}`, data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
-  deleteProject: async(id:string) => {
-    try{
-      const response = await api.delete(`/api/projects/${id}`)
-      return response.data
-    }catch(error){
-      throw error
+  deleteProject: async (id: string) => {
+    try {
+      const response = await api.delete(`/api/projects/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
     }
-  }
-}
-
-
+  },
+};
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if(token){
-    config.headers.Authorization = `Bearer ${token}`
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  return config
-})
-
+  return config;
+});
 
 export const taskApi = {
   getTasks: async (projectId: string) => {
@@ -115,9 +116,16 @@ export const taskApi = {
     }
   },
 
-  updateTask: async (projectId: string, taskId: string, data: Partial<Task>) => {
+  updateTask: async (
+    projectId: string,
+    taskId: string,
+    data: Partial<Task>
+  ) => {
     try {
-      const response = await api.put(`/api/projects/${projectId}/tasks/${taskId}`, data);
+      const response = await api.put(
+        `/api/projects/${projectId}/tasks/${taskId}`,
+        data
+      );
       return response.data;
     } catch (error) {
       throw error;
@@ -126,15 +134,15 @@ export const taskApi = {
 
   deleteTask: async (projectId: string, taskId: string) => {
     try {
-      const response = await api.delete(`/api/projects/${projectId}/tasks/${taskId}`);
+      const response = await api.delete(
+        `/api/projects/${projectId}/tasks/${taskId}`
+      );
       return response.data;
     } catch (error) {
       throw error;
     }
-  }
+  },
 };
-
-
 
 export const projectMemberApi = {
   getProjectMembers: async (projectId: string) => {
@@ -148,7 +156,9 @@ export const projectMemberApi = {
 
   addProjectMember: async (projectId: string, userId: string) => {
     try {
-      const response = await api.post(`/api/projects/${projectId}/members/${userId}`);
+      const response = await api.post(
+        `/api/projects/${projectId}/members/${userId}`
+      );
       return response.data;
     } catch (error) {
       throw error;
@@ -157,12 +167,14 @@ export const projectMemberApi = {
 
   removeProjectMember: async (projectId: string, userId: string) => {
     try {
-      const response = await api.delete(`/api/projects/${projectId}/members/${userId}`);
+      const response = await api.delete(
+        `/api/projects/${projectId}/members/${userId}`
+      );
       return response.data;
     } catch (error) {
       throw error;
     }
-  }
+  },
 };
 
 export const userApi = {
@@ -175,25 +187,25 @@ export const userApi = {
     }
   },
   getSubscriptionStatus: async () => {
-    try{
-
-      const response = await api.get('/api/subscription-status');
+    try {
+      const response = await api.get("/api/subscription-status");
       return response.data;
-    }catch(error){
-      throw error
+    } catch (error) {
+      throw error;
     }
-  }
+  },
 };
-
 
 export const subscriptionApi = {
   getProducts: async () => {
-    const response = await api.get('/api/products');
+    const response = await api.get("/api/products");
     return response.data;
   },
 
   createCheckoutSession: async (price_id: string) => {
-    const response = await api.post('/api/create-checkout-session', { price_id });
+    const response = await api.post("/api/create-checkout-session", {
+      price_id,
+    });
     return response.data;
-  }
+  },
 };

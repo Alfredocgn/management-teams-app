@@ -83,8 +83,8 @@ async def create_checkout_session(
             payment_method_types=["card"],
             line_items=[{"price": request.price_id, "quantity": 1}],
             mode="subscription",
-            success_url="http://localhost:5173/dashboard/projects",
-            cancel_url="http://localhost:5173/dashboard/subscription",
+            success_url="http://front-team-management.s3-website-us-east-1.amazonaws.com/dashboard/projects",
+            cancel_url="http://front-team-management.s3-website-us-east-1.amazonaws.com/dashboard/subscription",
             metadata={
                 "user_id": str(current_user.id)
             }
